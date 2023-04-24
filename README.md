@@ -1,13 +1,14 @@
 # Micro-services with golang
 
 ## How to build services ?
- 
-* Frontend
+From build directory run the follwing commandes:
+
+* Frontend service
 ```
 make start
 ```
 
-* Broker-service
+* Broker service
 ```
 make up
 ```
