@@ -3,12 +3,14 @@
 ## How to build services ?
 From build directory run the follwing commandes:
 
-* Frontend service
+* Run the front-end service with : 
 ```
+make build_front
 make start
 ```
 
-* Broker service
+* Run other servics with :
 ```
-make up
+make up_build
 ```
+
