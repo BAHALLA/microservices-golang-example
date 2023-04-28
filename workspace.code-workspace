@@ -15,6 +15,9 @@
 		{
 			"name": "build",
 			"path": "build"
+		},
+		{
+			"path": "logger-service"
 		}
 	]
 }
