@@ -14,3 +14,4 @@ make start
 make up_build
 ```
 
+![ui](build/docs/ui.png)
