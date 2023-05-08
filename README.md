@@ -2,7 +2,7 @@
 This is an example on how to build micro-services using golang.
 
 ## How to build services ?
-From build directory run the follwing commandes:
+From `build directory` run the follwing commandes:
 
 * Run the front-end service with : 
 ```
