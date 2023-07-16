@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 )
 
@@ -11,6 +12,14 @@ type RequestPaylaod struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omitempty"`
 	Log    LogPayload  `json:"log,omitempty"`
+	Mail   MailPaylaod `json:"mail,omitempty"`
+}
+
+type MailPaylaod struct {
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Subject string `json:"subject"`
+	Message string `json:"message"`
 }
 
 type AuthPayload struct {
@@ -37,6 +46,8 @@ func (app *Config) HandleRequest(res http.ResponseWriter, req *http.Request) {
 
 	err := app.readJson(res, req, &requestPayload)
 
+	log.Print(requestPayload)
+
 	if err != nil {
 		app.errorJson(res, err)
 		return
@@ -48,6 +59,8 @@ func (app *Config) HandleRequest(res http.ResponseWriter, req *http.Request) {
 		app.authenticate(res, requestPayload.Auth)
 	case "log":
 		app.logItem(res, requestPayload.Log)
+	case "mail":
+		app.sendMail(res, requestPayload.Mail)
 	default:
 		app.errorJson(res, errors.New("unknown action"))
 	}
@@ -134,8 +147,43 @@ func (app *Config) logItem(res http.ResponseWriter, logPLogPayload LogPayload) {
 	var jsonResponse jsonResponse
 
 	jsonResponse.Error = false
-	jsonResponse.Message= "logged"
+	jsonResponse.Message = "logged"
 
 	app.writeJson(res, http.StatusOK, jsonResponse)
 
+}
+
+func (app *Config) sendMail(res http.ResponseWriter, mailPayload MailPaylaod) {
+
+	log.Print(mailPayload)
+
+	jsonData, _ := json.MarshalIndent(mailPayload, "", "\t")
+
+	request, err := http.NewRequest("POST", "http://mail-service:8085/send", bytes.NewBuffer(jsonData))
+
+	if err != nil {
+		app.errorJson(res, err)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		app.errorJson(res, err)
+		return
+	}
+	defer response.Body.Close()
+
+	log.Printf("Status : %d", response.StatusCode)
+
+	if response.StatusCode != http.StatusOK {
+		app.errorJson(res, errors.New("error calling mail service"))
+		return
+	}
+	var jsonResponse jsonResponse
+	jsonResponse.Error = false
+	jsonResponse.Message = "Message sent to " + mailPayload.To
+
+	app.writeJson(res, http.StatusOK, jsonResponse)
 }

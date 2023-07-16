@@ -21,6 +21,24 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+ 
+  mail-service:
+    build:
+      context: ./../mail-service
+      dockerfile: ./../mail-service/mail-service.dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      MAIL_DOMAIN: "localhost"
+      MAIL_HOST: "mailhog"
+      MAIL_PORT: "1025"
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_ENCRYPTION: "none"
+      MAIL_FROM_NAME: "Taoufiq bahalla"
+      MAIL_FROM_ADDRESS: "bahalla.taoufiq@gmail.com"
 
   authentification-service:
     build:

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"html/template"
+	"log"
 	"time"
 
 	"github.com/vanng822/go-premailer/premailer"
@@ -71,6 +72,7 @@ func (mail *Mail) SendSMTPMessage(msg Message) error {
 	smtpClient, err := server.Connect()
 
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 
@@ -89,6 +91,7 @@ func (mail *Mail) SendSMTPMessage(msg Message) error {
 	err = email.Send(smtpClient)
 
 	if err != nil {
+		log.Print(err)
 		return err
 	}
 	return nil
@@ -102,12 +105,14 @@ func (mail *Mail) buildHTMLMessage(msg Message) (string, error) {
 	t, err := template.New("email-template").ParseFiles(templateToRender)
 
 	if err != nil {
+		log.Print(err)
 		return "", err
 	}
 
 	var tpl bytes.Buffer
 
 	if err = t.ExecuteTemplate(&tpl, "body", msg.DataMap); err != nil {
+		log.Print(err)
 		return "", err
 	}
 
@@ -115,6 +120,7 @@ func (mail *Mail) buildHTMLMessage(msg Message) (string, error) {
 	formattedMessage, err = mail.inlineCss(formattedMessage)
 
 	if err != nil {
+		log.Print(err)
 		return "", err
 	}
 
